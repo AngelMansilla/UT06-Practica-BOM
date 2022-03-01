@@ -1,1 +1,1 @@
-# UT06-Pr-ctica-BOM
+# UT06-Practica-BOM
