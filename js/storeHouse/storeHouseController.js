@@ -104,6 +104,7 @@ class StoreHouseController {
     this.#storeHouseView.bindProductsStoreCategoryTypeList(this.handleProductsType, store, "");
   }
   handleProductsStoreCategoryList = (store, title) => {
+
     let category = this.#storeHouseModel.getCategory(title);
     this.#storeHouseView.listProducts(this.#storeHouseModel.getShowCategoryProducts(store, category), store.name + " - " + category.title);
     this.#storeHouseView.bindShowProduct(this.handleShowProduct);

@@ -1,6 +1,16 @@
+"use strict";
 import StoreHouse from './storeHouseModel.js';
 
 class StoreHouseView {
+
+  #excecuteHandler(
+    handler, handlerArguments, scrollElement, data, url, event) {
+    handler(...handlerArguments);
+    $(scrollElement).get(0).scrollIntoView();
+    history.pushState(data, null, url);
+    event.preventDefault();
+  }
+
   constructor() {
     this.main = $('main');
     this.categories = $('#categories');
@@ -15,7 +25,7 @@ class StoreHouseView {
     let container = `<section class="stores" id="container_stores">`;
     for (let store of _stores) {
       this.stores.append(`<a data-store="${store.store.name}" class='dropdown-item' href='#product-list-store'>${store.store.name}</a>`);
-      container += `<article data-store="${store.store.name}"  class="store"><a href="#product-list-store"><img class="img_stores" src="img/${store.store.name}.png"></a></article>`;
+      container += `<a href="#product-list-store" data-store="${store.store.name}"><article class="store"><img class="img_stores" src="img/${store.store.name}.png"></article></a>`;
     }
     container += "</section>";
     container = $(container);
@@ -32,38 +42,89 @@ class StoreHouseView {
 
   bindInit(handler) {
     $('#init').click((event) => {
-      handler();
+      this.#excecuteHandler(handler, [], 'body', { action: 'init' }, '#', event);
     });
     $('#logo').click((event) => {
-      handler();
+      this.#excecuteHandler(handler, [], 'body', { action: 'init' }, '#', event);
     });
   }
 
   bindProductsCategoryList(handler) {
-    this.categories.children().click(function (event) {
-      handler(this.dataset.category);
+    this.categories.children().click((event) => {
+      let category =
+        $(event.target).closest($('a')).get(0).dataset.category;
+      this.#excecuteHandler(
+        handler, [category],
+        '#product-list',
+        { action: 'productsCategoryList', category: category },
+        '#category-list', event);
     });
   }
 
   bindProductsStoreList(handler) {
-    this.stores.children().click(function (event) {
-      handler(this.dataset.store);
+    this.stores.children().click((event) => {
+      let store =
+        $(event.target).closest($('a')).get(0).dataset.store;
+      this.#excecuteHandler(
+        handler, [store],
+        '#product-list',
+        { action: 'productsStoreList', store: store },
+        '#store-list', event);
     });
-    $('#container_stores').children().click(function (event) {
-      handler(this.dataset.store);
+    $('#container_stores').children().click( (event) => {
+      let store =
+        $(event.target).closest($('a')).get(0).dataset.store;
+      this.#excecuteHandler(
+        handler, [store],
+        '#product-list',
+        { action: 'productsStoreList', store: store },
+        '#store-list', event);
     });
   }
 
   bindProductsStoreCategoryList(handler, store) {
-    this.categories.children().click(function (event) {
-      handler(store, this.dataset.category);
+    this.categories.children().click((event) => {
+      let category =
+        $(event.target).closest($('a')).get(0).dataset.category;
+      this.#excecuteHandler(
+        handler, [store, category],
+        '#product-list',
+        { action: 'productsStoreCategoryList', store: store, category: category },
+        '#store-category-list', event);
     });
   }
-  bindProductsStoreCategoryTypeList(handler, store, title) {
-    $('#type').change(function (event) {
-      handler(this.value, store, title);
+
+  bindProductsStoreCategoryTypeList(handler, store, category) {
+    $('#type').change((event) => {
+      let type =
+        $(event.target).get(0).value;
+      this.#excecuteHandler(
+        handler, [type, store, category],
+        '#product-list',
+        { action: 'productsStoreCategoryTypeList', type: type, store: store, category: category},
+        '#store-category-type-list', event);
       //Marcamos como sleccionado el tipo que hemos filtrado
-      $('#type').val(this.value);
+      $('#type').val(type);
+    });
+  }
+
+  bindShowProduct(handler) {
+    $('#product-list').find('a.img-wrap').click((event) => {
+      let serial = $(event.target).closest($('a')).get(0).dataset.serial;
+      this.#excecuteHandler(handler, [serial],
+        '#single-product',
+        { action: 'showProduct', serial: serial },
+        '#single-product',
+        event);
+    });
+    $('#product-list').find('figcaption a').click((event) => {
+      this.#excecuteHandler(
+        handler,
+        [event.target.dataset.serial],
+        '#single-product',
+        { action: 'showProduct', serial: event.target.dataset.serial },
+        '#product-list',
+        event);
     });
   }
 
@@ -162,14 +223,7 @@ class StoreHouseView {
     return $('<div>Características de memoria RAM</div>');
   }
 
-  bindShowProduct(handler) {
-    $('#product-list').find('a.img-wrap').click(function (event) {
-      handler(this.dataset.serial);
-    });
-    $('#product-list').find('figcaption a').click(function (event) {
-      handler(this.dataset.serial);
-    });
-  }
+
 
 
 

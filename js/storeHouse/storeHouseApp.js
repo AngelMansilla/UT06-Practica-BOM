@@ -15,9 +15,10 @@ import { StoreException, CoordsStoreException, Store, Coords } from './storeHous
 import StoreHouseController from './storeHouseController.js';
 import StoreHouseView from './storeHouseView.js';
 
-$(function() {
-  const StoreHouseApp = new StoreHouseController(
-    StoreHouse.getInstance("Almacen"), new StoreHouseView()
-  );
-});
 
+
+const StoreHouseApp = new StoreHouseController(
+  StoreHouse.getInstance("Almacen"), new StoreHouseView()
+);
+
+export default StoreHouseApp;
