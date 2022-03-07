@@ -15,6 +15,8 @@ class StoreHouseView {
     this.main = $('main');
     this.categories = $('#categories');
     this.stores = $('#stores');
+    this.productWindow = null;
+    this.aWindows = [];
   }
 
   //Mostrar las tiendas tanto en el menu como en el main
@@ -39,6 +41,8 @@ class StoreHouseView {
       this.categories.append(`<a data-category="${category.title}" class='dropdown-item' href='#product-list-category'>${category.title}</a>`);
     }
   }
+
+
 
   bindInit(handler) {
     $('#init').click((event) => {
@@ -71,7 +75,7 @@ class StoreHouseView {
         { action: 'productsStoreList', store: store },
         '#store-list', event);
     });
-    $('#container_stores').children().click( (event) => {
+    $('#container_stores').children().click((event) => {
       let store =
         $(event.target).closest($('a')).get(0).dataset.store;
       this.#excecuteHandler(
@@ -101,7 +105,7 @@ class StoreHouseView {
       this.#excecuteHandler(
         handler, [type, store, category],
         '#product-list',
-        { action: 'productsStoreCategoryTypeList', type: type, store: store, category: category},
+        { action: 'productsStoreCategoryTypeList', type: type, store: store, category: category },
         '#store-category-type-list', event);
       //Marcamos como sleccionado el tipo que hemos filtrado
       $('#type').val(type);
@@ -111,7 +115,9 @@ class StoreHouseView {
   bindShowProduct(handler) {
     $('#product-list').find('a.img-wrap').click((event) => {
       let serial = $(event.target).closest($('a')).get(0).dataset.serial;
-      this.#excecuteHandler(handler, [serial],
+      this.#excecuteHandler(
+        handler,
+        [serial],
         '#single-product',
         { action: 'showProduct', serial: serial },
         '#single-product',
@@ -123,10 +129,41 @@ class StoreHouseView {
         [event.target.dataset.serial],
         '#single-product',
         { action: 'showProduct', serial: event.target.dataset.serial },
-        '#product-list',
+        '#single-product',
         event);
     });
   }
+
+  bindShowProductInNewWindow(handler) {
+    $('#b-open').click((event) => {
+      if (!this.productWindow || this.productWindow.closed) {
+        this.productWindow = window.open("product.html", "ProductWindow-" + event.target.dataset.serial, "width=800, height=600, top=250, left=250, titlebar=yes, toolbar=no, menubar=no, location=no", "popup");
+        this.aWindows.push(this.productWindow);
+        this.productWindow.addEventListener('DOMContentLoaded', () => {
+          handler(event.target.dataset.serial)
+        });
+      } else {
+        if ($(this.productWindow.document).find('header nav h1').get(0).dataset.serial !== event.target.dataset.serial) {
+          this.productWindow = window.open("product.html", "ProductWindow-" + event.target.dataset.serial, "width=800, height=600, top=250, left=250, titlebar=yes, toolbar=no, menubar=no, location=no", "popup");
+          this.aWindows.push(this.productWindow);
+          this.productWindow.addEventListener('DOMContentLoaded', () => {
+            handler(event.target.dataset.serial)
+          });
+        } else {
+          this.productWindow.focus();
+        }
+      }
+    });
+  }
+
+  bindCloseProductInNewWindow() {
+    $('#close-windows').click((event) => {
+      this.aWindows.forEach(window => {
+        window.close();
+      });
+    })
+  }
+
 
   listProducts(products, title) {
     this.main.empty();
@@ -185,7 +222,7 @@ class StoreHouseView {
 										</div>
 										<p class="about">${product.product.description}</p>
 										<div class="sizes mt-5">
-											<h6 class="text-uppercase">${product.product.tax}</h6>
+                      <button id="b-open" data-serial="${product.product.serialNumber}" class="btn btn-primary text-uppercase mr-2 px-4">Abrir en nueva ventana</button>
 										</div>
 									</div>
 								</div>
@@ -207,6 +244,52 @@ class StoreHouseView {
     this.main.append(container);
   }
 
+  showProductInNewWindow(product, message) {
+    let main = $(this.productWindow.document).find('main');
+    let header = $(this.productWindow.document).find('header nav');
+    main.empty();
+    header.empty();
+    let container;
+    if (product) {
+      this.productWindow.document.title = `${product.product.constructor.name} - ${product.product.name} `;
+      header.append(`<h1 data-serial="${product.product.serialNumber}" class="display5 text-light text-center"> ${product.product.constructor.name} - ${product.product.name}</h1>`);
+      container = $(`<div id = "singleproduct" class="${product.product.constructor.name}-style container mt-5 mb-5">
+			<div class="row d-flex justify-content-center">
+				<div class="col-md-10">
+					<div class="card">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="images p-3">
+									<div class="text-center p-4"> <img id="mainimage" src="img/${product.product.images}" /> </div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="product p-4">
+									<div class="mt-4 mb-3">
+                    <span class="textuppercase text-muted name">${product.product.name}</span>
+										<h5 class="text-uppercase">${product.product.constructor.name}</h5>
+										<div class="price d-flex flex-row align-itemscenter">
+											<span class="actprice">${product.product.price}€</span>
+										</div>
+										</div>
+										<p class="about">${product.product.description}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+      <div class="d-flex justify-content-center">
+			<button class="btn btn-primary text-uppercase m-2 px4 " onClick="window.close()">Cerrar</button>
+      </div>`);
+      container.find('h6').after(this.#instance[product.constructor.name]);
+    } else {
+      container = $(`<div class="container mt-5 mb-5"><div class="row d-flex justify-content-center">${message}</div></div>`);
+    }
+    main.append(container);
+    this.productWindow.document.body.scrollIntoView();
+  }
 
   #instance = {
     Processor: this.#ProcessorCharacteristics,

@@ -79,6 +79,7 @@ class StoreHouseController {
     this.#storeHouseView.showStores(this.#storeHouseModel.stores);
     this.#storeHouseView.bindProductsCategoryList(this.handleProductsCategoryList);
     this.#storeHouseView.bindProductsStoreList(this.handleProductsStoreList);
+    this.#storeHouseView.bindCloseProductInNewWindow();
   }
 
   handleInit = () => {
@@ -132,8 +133,19 @@ class StoreHouseController {
       let product = this.#storeHouseModel.getProduct(Number.parseInt(serialNumber));
       this.#storeHouseView.showProduct(product);
       this.#storeHouseView.bindProductsCategoryList(this.handleProductsCategoryList);
+      this.#storeHouseView.bindShowProductInNewWindow(this.handleShowProductInNewWindow);
     } catch (error) {
       this.#storeHouseView.showProduct(null, 'No existe este producto en la página.');
+    }
+  }
+
+  handleShowProductInNewWindow = (serial) => {
+    try {
+      let product = this.#storeHouseModel.getProduct(Number.parseInt(serial));
+      this.#storeHouseView.showProductInNewWindow(product);
+    }
+    catch (error) {
+      this.#storeHouseView.showProductInNewWindow(null, 'No existe este producto en la página.');
     }
   }
 
