@@ -104,8 +104,8 @@ class StoreHouseController {
     this.#storeHouseView.bindProductsStoreCategoryList(this.handleProductsStoreCategoryList, store);
     this.#storeHouseView.bindProductsStoreCategoryTypeList(this.handleProductsType, store, "");
   }
-  handleProductsStoreCategoryList = (store, title) => {
-
+  handleProductsStoreCategoryList = (name, title) => {
+    let store = this.#storeHouseModel.getStore(name);
     let category = this.#storeHouseModel.getCategory(title);
     this.#storeHouseView.listProducts(this.#storeHouseModel.getShowCategoryProducts(store, category), store.name + " - " + category.title);
     this.#storeHouseView.bindShowProduct(this.handleShowProduct);
@@ -113,6 +113,13 @@ class StoreHouseController {
   }
 
   handleProductsType = (type, store, category) => {
+    // En caso de pasar nombre de la tienda o de la categoria, cambiamos la variable al objeto de estos.
+    if (store) {
+      store = this.#storeHouseModel.getStore(store);
+    }
+    if (category) {
+      category = this.#storeHouseModel.getCategory(category);
+    }
     if (type) {
       if (store && category) {
         this.#storeHouseView.listProducts(this.#storeHouseModel.getShowCategoryProducts(store, category, type), store.name + " - " + category.title);

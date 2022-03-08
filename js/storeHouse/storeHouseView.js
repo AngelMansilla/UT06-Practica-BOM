@@ -60,7 +60,7 @@ class StoreHouseView {
       this.#excecuteHandler(
         handler, [category],
         '#product-list',
-        { action: 'productsCategoryList', category: category },
+        { 'action': 'productsCategoryList', 'category': category },
         '#category-list', event);
     });
   }
@@ -72,7 +72,7 @@ class StoreHouseView {
       this.#excecuteHandler(
         handler, [store],
         '#product-list',
-        { action: 'productsStoreList', store: store },
+        { 'action': 'productsStoreList', 'store': store },
         '#store-list', event);
     });
     $('#container_stores').children().click((event) => {
@@ -81,7 +81,7 @@ class StoreHouseView {
       this.#excecuteHandler(
         handler, [store],
         '#product-list',
-        { action: 'productsStoreList', store: store },
+        { 'action': 'productsStoreList', 'store': store },
         '#store-list', event);
     });
   }
@@ -91,21 +91,27 @@ class StoreHouseView {
       let category =
         $(event.target).closest($('a')).get(0).dataset.category;
       this.#excecuteHandler(
-        handler, [store, category],
+        handler, [store.name, category],
         '#product-list',
-        { action: 'productsStoreCategoryList', store: store, category: category },
+        { 'action': 'productsStoreCategoryList', 'store': store.name, 'category': category },
         '#store-category-list', event);
     });
   }
 
   bindProductsStoreCategoryTypeList(handler, store, category) {
+    if (category) {
+      category = category.title;
+    }
+    if (store) {
+      store = store.name;
+    }
     $('#type').change((event) => {
       let type =
         $(event.target).get(0).value;
       this.#excecuteHandler(
         handler, [type, store, category],
         '#product-list',
-        { action: 'productsStoreCategoryTypeList', type: type, store: store, category: category },
+        { 'action': 'productsStoreCategoryTypeList', 'type': type, 'store': store, 'category': category },
         '#store-category-type-list', event);
       //Marcamos como sleccionado el tipo que hemos filtrado
       $('#type').val(type);
@@ -119,18 +125,14 @@ class StoreHouseView {
         handler,
         [serial],
         '#single-product',
-        { action: 'showProduct', serial: serial },
-        '#single-product',
-        event);
+        { 'action': 'showProduct', 'serial': serial }, '#single-product', event);
     });
     $('#product-list').find('figcaption a').click((event) => {
       this.#excecuteHandler(
         handler,
         [event.target.dataset.serial],
         '#single-product',
-        { action: 'showProduct', serial: event.target.dataset.serial },
-        '#single-product',
-        event);
+        { 'action': 'showProduct', 'serial': event.target.dataset.serial }, '#single-product', event);
     });
   }
 
