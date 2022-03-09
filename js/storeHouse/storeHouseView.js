@@ -113,10 +113,9 @@ class StoreHouseView {
         '#product-list',
         { 'action': 'productsStoreCategoryTypeList', 'type': type, 'store': store, 'category': category },
         '#store-category-type-list', event);
-      //Marcamos como sleccionado el tipo que hemos filtrado
-      $('#type').val(type);
     });
   }
+
 
   bindShowProduct(handler) {
     $('#product-list').find('a.img-wrap').click((event) => {
@@ -291,6 +290,11 @@ class StoreHouseView {
     }
     main.append(container);
     this.productWindow.document.body.scrollIntoView();
+  }
+
+  //Marcamos como sleccionado el tipo que hemos filtrado
+  showType(type) {
+    $('#type').val(type);
   }
 
   #instance = {

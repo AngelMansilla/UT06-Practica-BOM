@@ -133,6 +133,7 @@ class StoreHouseController {
     }
     this.#storeHouseView.bindShowProduct(this.handleShowProduct);
     this.#storeHouseView.bindProductsStoreCategoryTypeList(this.handleProductsType, store, category);
+    this.#storeHouseView.showType(type);
   }
 
   handleShowProduct = (serialNumber) => {
